@@ -1,0 +1,15 @@
+name: today-in-history
+description: "Posts notable historical events for today. Can be manually triggered."
+version: 1
+author: Adewale Olaore
+entry_point: https://your-agent-host.example.com/a2a  # your agent webhook
+routes:
+  on_message:
+    path: /a2a/message
+    method: POST
+  on_ping:
+    path: /a2a/ping
+    method: POST
+permissions:
+  - send_messages
+  - receive_messages
