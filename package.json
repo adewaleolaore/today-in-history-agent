@@ -7,7 +7,7 @@
     "dev": "mastra dev --dir src/mastra",
     "a2a": "tsx src/a2a-server.ts",
     "build": "tsc",
-    "start": "npm run build && node dist/src/a2a-server.js"
+    "start": "tsx src/a2a-server.ts"
   },
   "keywords": [],
   "author": "",
@@ -24,11 +24,11 @@
     "express": "^5.1.0",
     "mastra": "latest",
     "node-cron": "^4.2.1",
+    "tsx": "^4.20.6",
     "typescript": "^5.9.3",
     "zod": "^4.1.12"
   },
   "devDependencies": {
-    "ts-node": "^10.9.2",
-    "tsx": "^4.20.6"
+    "ts-node": "^10.9.2"
   }
 }
