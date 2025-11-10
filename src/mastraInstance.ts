@@ -1,9 +1,9 @@
 import { Mastra } from "@mastra/core";
 
-import { todayInHistoryAgent } from "./mastra/agents/todayInHistoryAgent";
-import { summaryAgent } from "./mastra/agents/summaryAgent";
+import { todayInHistoryAgent } from "./mastra/agents/todayInHistoryAgent.js";
+import { summaryAgent } from "./mastra/agents/summaryAgent.js";
 
-import { todayInHistoryWorkflow } from "./mastra/workflows/todayInHistoryWorkflow";
+import { todayInHistoryWorkflow } from "./mastra/workflows/todayInHistoryWorkflow.js";
 
 export const mastra = new Mastra({
   agents: { 

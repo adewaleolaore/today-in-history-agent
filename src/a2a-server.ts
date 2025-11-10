@@ -1,7 +1,7 @@
 // src/a2a-server.ts
 import "dotenv/config";
 import express from "express";
-import { mastra } from "./mastraInstance";
+import { mastra } from "./mastraInstance.js";
 
 const app = express();
 app.use(express.json());

@@ -2,9 +2,9 @@
 import { Mastra } from '@mastra/core/mastra';
 import { PinoLogger } from '@mastra/loggers';
 import { LibSQLStore } from '@mastra/libsql';
-import { todayInHistoryWorkflow } from './workflows/todayInHistoryWorkflow';
-import { summaryAgent } from './agents/summaryAgent';
-import { todayInHistoryAgent } from './agents/todayInHistoryAgent';
+import { todayInHistoryWorkflow } from './workflows/todayInHistoryWorkflow.js';
+import { summaryAgent } from './agents/summaryAgent.js';
+import { todayInHistoryAgent } from './agents/todayInHistoryAgent.js';
 
 
 export const mastra = new Mastra({
@@ -34,7 +34,7 @@ export const mastra = new Mastra({
           }
           
           try {
-            let body = {};
+            let body: any = {};
             try {
               body = await c.req.json();
             } catch (jsonErr) {

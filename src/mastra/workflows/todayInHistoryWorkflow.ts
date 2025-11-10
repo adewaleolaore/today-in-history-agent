@@ -1,12 +1,15 @@
 import { createStep, createWorkflow } from "@mastra/core/workflows";
 import { z } from "zod";
-import { todayInHistoryAgent } from "../agents/todayInHistoryAgent";
-import { summaryAgent } from "../agents/summaryAgent";
+import { todayInHistoryAgent } from "../agents/todayInHistoryAgent.js";
+import { summaryAgent } from "../agents/summaryAgent.js";
 
 // Step 1: Fetch historical events
 const fetchHistory = createStep({
   id: "fetch-history",
   description: "Fetches today's historical events.",
+  inputSchema: z.object({
+    date: z.string().optional(),
+  }),
   outputSchema: z.object({
     events: z.string(),
   }),

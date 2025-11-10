@@ -41,8 +41,9 @@ export const todayInHistoryAgent = new Agent({
   }),
   tools: {
     fetchHistoricalEvents: {
+      id: "fetchHistoricalEvents",
       description: "Fetches historical events for a specific date from Wikipedia's 'On This Day' API. Always provide both month and day as numbers.",
-      parameters: {
+      inputSchema: {
         type: "object",
         properties: {
           month: {
@@ -61,7 +62,8 @@ export const todayInHistoryAgent = new Agent({
         required: ["month", "day"],
         additionalProperties: false
       },
-      execute: async ({ month, day }: { month: number; day: number }) => {
+      execute: async (context: any) => {
+        const { month, day } = context as { month: number; day: number };
         try {
           // Validate parameters
           if (!month || !day || month < 1 || month > 12 || day < 1 || day > 31) {
