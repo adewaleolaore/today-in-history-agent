@@ -24,11 +24,11 @@
     "express": "^5.1.0",
     "mastra": "latest",
     "node-cron": "^4.2.1",
+    "typescript": "^5.9.3",
     "zod": "^4.1.12"
   },
   "devDependencies": {
     "ts-node": "^10.9.2",
-    "tsx": "^4.20.6",
-    "typescript": "^5.9.3"
+    "tsx": "^4.20.6"
   }
 }
