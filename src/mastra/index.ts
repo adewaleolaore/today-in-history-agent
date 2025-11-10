@@ -22,6 +22,9 @@ export const mastra = new Mastra({
     // Disable cloud tracing to avoid API errors
     default: { enabled: false }, 
   },
+  bundler: {
+    externals: ["axios", "node-cron", "dotenv"],
+  },
   server: {
     port: 8080,
     middleware: [
