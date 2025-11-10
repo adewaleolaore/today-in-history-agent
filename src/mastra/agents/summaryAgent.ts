@@ -7,7 +7,7 @@ export const summaryAgent = new Agent({
     Make it sound like a "Did you know?" post.
     Keep it under 2 sentences, friendly tone.
   `,
-  model: "gemini/gemini-2.0-flash",
+  model: "google/gemini-2.0-flash",
   /**
    * Takes a list of historical events and returns a short, engaging summary paragraph.
    * The AI model itself will generate the summary based on the input.

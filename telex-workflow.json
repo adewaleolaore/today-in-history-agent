@@ -12,23 +12,23 @@ When you deploy your Mastra server (e.g. on Render, Railway, or Vercel), replace
 {
   "active": true,
   "category": "utilities",
-  "description": "A workflow that fetches and summarizes historical events for today or a given date.",
+  "description": "Fetches and summarizes historical events for today or any requested date",
   "id": "today_in_history_workflow",
-  "long_description": "The Today in History Agent provides a concise list of notable events for today or any requested date. It uses the Wikipedia 'On This Day' API and Google Gemini for summarization. Commands: 'today' or 'history <month> <day>'.",
-  "name": "today_in_history_agent",
+  "long_description": "The Today in History Agent provides notable events from Wikipedia. Ask 'today' for today's events or 'history <month> <day>' for a specific date (e.g., 'history 7 4' for July 4th). Uses Wikipedia's 'On This Day' API and Google Gemini for intelligent responses.",
+  "name": "Today in History Agent",
   "nodes": [
     {
-      "id": "today_in_history_node",
-      "name": "Today in History Agent",
+      "id": "today_history_node",
+      "name": "Today in History",
       "parameters": {},
-      "position": [450, 120],
+      "position": [100, 100],
       "type": "a2a/mastra-a2a-node",
       "typeVersion": 1,
-      "url": "https://your-deployed-domain.com/a2a/message"
+      "url": "https://today-in-history-agent-production.up.railway.app/a2a/message"
     }
   ],
   "settings": {
     "executionOrder": "v1"
   },
-  "short_description": "Fetches daily historical events using Mastra AI Agent"
+  "short_description": "Historical events for any date"
 }

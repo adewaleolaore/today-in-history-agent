@@ -5,22 +5,97 @@ import { LibSQLStore } from "@mastra/libsql";
 import axios from "axios";
 
 /**
- * Agent declaration: purely defines identity, model, and memory.
- * No execution logic inside — handled externally via .runs()
+ * Generate dynamic instructions with current date
+ */
+function getInstructions() {
+  const now = new Date();
+  const month = now.getMonth() + 1;
+  const day = now.getDate();
+  
+  return `You are a helpful assistant that provides historical events.
+
+When the user asks for "today" or a specific date, immediately call the fetchHistoricalEvents tool:
+- For "today": call fetchHistoricalEvents(${month}, ${day})
+- For "Nov 11" or "November 11": call fetchHistoricalEvents(11, 11)
+- For "12/25": call fetchHistoricalEvents(12, 25)
+
+Month mapping: Jan=1, Feb=2, Mar=3, Apr=4, May=5, Jun=6, Jul=7, Aug=8, Sep=9, Oct=10, Nov=11, Dec=12
+
+After getting the events, format them nicely with "📜 Today in History 📜" at the top.`;
+}
+
+/**
+ * Agent with tool integration for fetching historical events
  */
 export const todayInHistoryAgent = new Agent({
   id: "today-in-history-agent",
   name: "Today in History Agent",
   description:
     "Fetches and formats notable historical events for today or a requested date.",
-  instructions:
-    "You are a helpful assistant that provides notable historical events for today or a requested date. When possible, return them clearly as bullet points with the year and short description.",
-  model: "gemini/gemini-2.0-flash",
+  instructions: getInstructions(),
+  model: "google/gemini-2.0-flash",
   memory: new Memory({
     storage: new LibSQLStore({
       url: "file:../mastra.db", // relative to .mastra/output
     }),
   }),
+  tools: {
+    fetchHistoricalEvents: {
+      description: "Fetches historical events for a specific date from Wikipedia's 'On This Day' API. Always provide both month and day as numbers.",
+      parameters: {
+        type: "object",
+        properties: {
+          month: {
+            type: "number",
+            description: "Month as a number from 1 (January) to 12 (December)",
+            minimum: 1,
+            maximum: 12
+          },
+          day: {
+            type: "number",
+            description: "Day of month as a number from 1 to 31",
+            minimum: 1,
+            maximum: 31
+          }
+        },
+        required: ["month", "day"],
+        additionalProperties: false
+      },
+      execute: async ({ month, day }: { month: number; day: number }) => {
+        try {
+          // Validate parameters
+          if (!month || !day || month < 1 || month > 12 || day < 1 || day > 31) {
+            // Silently handle invalid parameters (e.g., from playground validation)
+            if (month === undefined && day === undefined) {
+              return "Please provide both month and day numbers.";
+            }
+            console.error(`❌ Invalid parameters: month=${month}, day=${day}`);
+            return "Invalid date parameters. Month must be 1-12 and day must be 1-31.";
+          }
+          
+          console.log(`🔍 Fetching historical events for ${month}/${day}...`);
+          
+          const url = `https://en.wikipedia.org/api/rest_v1/feed/onthisday/events/${month}/${day}`;
+          const response = await axios.get(url, {
+            headers: {
+              'User-Agent': 'TodayInHistoryBot/1.0 (Educational Project)'
+            }
+          });
+          const events = response.data.events.slice(0, 5);
+          
+          if (!events.length) {
+            return `No historical events found for ${month}/${day}.`;
+          }
+          
+          const formatted = events.map((e: any) => `• ${e.year}: ${e.text}`).join("\n");
+          return `📜 Historical events for ${month}/${day}:\n\n${formatted}`;
+        } catch (err) {
+          console.error("Error fetching historical events:", err);
+          return "Sorry, I couldn't fetch historical events right now. The Wikipedia API might be temporarily unavailable.";
+        }
+      }
+    }
+  }
 });
 
 /**
@@ -48,7 +123,11 @@ export async function fetchTodayInHistory(input: string): Promise<string> {
     }
 
     const url = `https://en.wikipedia.org/api/rest_v1/feed/onthisday/events/${month}/${day}`;
-    const response = await axios.get(url);
+    const response = await axios.get(url, {
+      headers: {
+        'User-Agent': 'TodayInHistoryBot/1.0 (Educational Project)'
+      }
+    });
     const events = response.data.events.slice(0, 5);
 
     if (!events.length) return `No historical events found for ${month}/${day}.`;

@@ -1,8 +1,8 @@
 name: today-in-history
-description: "Posts notable historical events for today. Can be manually triggered."
+description: "Posts notable historical events for today or any requested date"
 version: 1
 author: Adewale Olaore
-entry_point: https://your-agent-host.example.com/a2a  # your agent webhook
+entry_point: https://today-in-history-agent-production.up.railway.app/a2a/message
 routes:
   on_message:
     path: /a2a/message

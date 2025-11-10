@@ -12,3 +12,9 @@ mastra.db
 .DS_Store
 Thumbs.db
 .vscode
+
+# Other Files
+CODE_REVIEW.md
+FIXES_APPLIED.md
+QUICK_START.md
+WARP.md

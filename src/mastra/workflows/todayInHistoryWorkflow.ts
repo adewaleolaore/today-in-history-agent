@@ -12,8 +12,11 @@ const fetchHistory = createStep({
   }),
   execute: async () => {
     console.log("[Workflow] Step 1: Fetching today's history...");
-    const result = await todayInHistoryAgent.run("today");
-    return { events: result };
+    const result = await todayInHistoryAgent.generate([{
+      role: 'user',
+      content: 'today'
+    }]);
+    return { events: result.text || '' };
   },
 });
 
@@ -30,10 +33,11 @@ const summarizeHistory = createStep({
   }),
   execute: async ({ inputData }) => {
     console.log("[Workflow] Step 2: Summarizing...");
-    const summary = await summaryAgent.run(
-      `Summarize these historical events into 2 sentences:\n\n${inputData.events}`
-    );
-    return { events: inputData.events, summary };
+    const result = await summaryAgent.generate([{
+      role: 'user',
+      content: `Summarize these historical events into 2 sentences:\n\n${inputData.events}`
+    }]);
+    return { events: inputData.events, summary: result.text || '' };
   },
 });
 
