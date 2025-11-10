@@ -7,11 +7,12 @@ It’s designed to integrate seamlessly with **[Telex.im](https://telex.im)** us
 
 ## Features
 
-- **Fetch Historical Events:** Uses the free Wikipedia “On This Day” API.  
-- **AI Summarization:** Uses **Google Gemini** through Mastra’s provider interface.  
+- **Fetch Historical Events:** Uses the free Wikipedia "On This Day" API.  
+- **AI Summarization:** Uses **Google Gemini** through Mastra's provider interface.  
 - **Workflow Automation:** Runs a 3-step workflow — Fetch → Summarize → Format.  
 - **Persistent Memory:** Uses `@mastra/memory` with `@mastra/libsql` for storage.  
-- **Telex-Ready:** Can be triggered via A2A integration to deliver daily summaries.  
+- **Daily Cron Job:** Automatically sends history facts at 8:00 AM (Africa/Lagos timezone).
+- **Telex-Ready:** Can be triggered via A2A integration to deliver summaries on demand.
 
 ---
 
@@ -69,28 +70,66 @@ To manually test the workflow from the command line:
 
     npx ts-node src/testWorkflow.ts
 
+## Deployment
+
+### Deploy to Railway
+
+1. **Push to GitHub** (if not already done)
+2. **Connect to Railway:**
+   - Go to [Railway.app](https://railway.app)
+   - Create new project from GitHub repo
+   - Railway will auto-detect Node.js and run `npm run build && npm run start`
+3. **Add environment variables in Railway:**
+   - `GOOGLE_GENERATIVE_AI_API_KEY` - Your Gemini API key
+   - `TELEX_WEBHOOK_URL` (optional) - For daily scheduled messages
+4. **Get your public URL** from Railway dashboard
+5. **Test the endpoint:**
+   ```bash
+   curl -X POST https://your-app.railway.app/a2a/message \
+     -H "Content-Type: application/json" \
+     -d '{"message": "today"}'
+   ```
+
 ## Telex Integration (A2A)
 
-To connect with Telex.im:
+### On-Demand Messages
 
-1. Deploy your Mastra instance to a public endpoint (e.g., Render, Railway, or Vercel).
-2. Use your public /a2a/message endpoint in the Telex workflow JSON.
-Example:
+To connect with Telex.im for user-triggered requests:
 
-    {
-        "nodes": [
-            {
-            "id": "today_history_agent",
-            "name": "Today in History Agent",
-            "type": "a2a/mastra-a2a-node",
-            "url": "https://your-server.com/a2a/message"
-            }
-        ]
-    }
-3. On Telex, your agent can respond to messages like:
-    >> today
-    >> history 7 4 (for July 4th)
-    >> history 1 1 (for January 1st)
+1. Go to [Telex.im](https://telex.im) and create/configure your agent
+2. Add your Railway URL as the A2A endpoint:
+   ```json
+   {
+     "nodes": [
+       {
+         "id": "today_history_agent",
+         "name": "Today in History Agent",
+         "type": "a2a/mastra-a2a-node",
+         "url": "https://your-app.railway.app/a2a/message"
+       }
+     ]
+   }
+   ```
+3. Users can now message:
+   - `today` - Get today's historical events
+   - `history 7 4` - Get July 4th events
+   - `history 12 25` - Get December 25th events
+
+### Daily Scheduled Messages
+
+The app includes a cron job that runs at **8:00 AM (Africa/Lagos timezone)** daily.
+
+To enable daily delivery to your Telex channel:
+
+1. Get your Telex channel webhook URL from channel settings
+2. Add it to Railway environment variables:
+   ```
+   TELEX_WEBHOOK_URL=https://telex.im/api/webhook/your-channel-id
+   ```
+3. Uncomment the webhook code in `src/server.ts` (lines 33-37)
+4. Redeploy or restart the Railway service
+
+The cron will automatically send daily history facts every morning!
 
 ## Project Structure
     today-in-history/
