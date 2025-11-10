@@ -1,0 +1,34 @@
+
+---
+
+## 'telex-workflow.json'
+
+Save this file in your project root as `telex-workflow.json`.
+
+This is a Telex.im workflow definition that connects directly to your deployed agent endpoint.  
+When you deploy your Mastra server (e.g. on Render, Railway, or Vercel), replace the placeholder URL.
+
+```json
+{
+  "active": true,
+  "category": "utilities",
+  "description": "A workflow that fetches and summarizes historical events for today or a given date.",
+  "id": "today_in_history_workflow",
+  "long_description": "The Today in History Agent provides a concise list of notable events for today or any requested date. It uses the Wikipedia 'On This Day' API and Google Gemini for summarization. Commands: 'today' or 'history <month> <day>'.",
+  "name": "today_in_history_agent",
+  "nodes": [
+    {
+      "id": "today_in_history_node",
+      "name": "Today in History Agent",
+      "parameters": {},
+      "position": [450, 120],
+      "type": "a2a/mastra-a2a-node",
+      "typeVersion": 1,
+      "url": "https://your-deployed-domain.com/a2a/message"
+    }
+  ],
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "short_description": "Fetches daily historical events using Mastra AI Agent"
+}
