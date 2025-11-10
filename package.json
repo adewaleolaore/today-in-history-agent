@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "npx mastra dev",
+    "prestart": "npx mastra dev",
     "start": "npx mastra start"
   },
   "keywords": [],
