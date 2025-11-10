@@ -63,7 +63,10 @@ export const todayInHistoryAgent = new Agent({
         additionalProperties: false
       },
       execute: async (context: any) => {
-        const { month, day } = context as { month: number; day: number };
+        // Extract parameters - Mastra passes them in context.params or directly
+        const params = context.params || context;
+        const month = params.month;
+        const day = params.day;
         try {
           // Validate parameters
           if (!month || !day || month < 1 || month > 12 || day < 1 || day > 31) {
