@@ -45,34 +45,29 @@ Mastra Workflow
 ## Getting Started
 
 ### 1. Clone the repository
-```bash
+
     git clone https://github.com/<your-username>/today-in-history-agent.git
-    cd today-in-history-agent
+    cd today-in-history-agent   
 
+### ### 2. Install Dependencies
 
-### 2. Install Dependencies
-```bash
     npm install
 
-
 ### 3. Set up environment variables
-```bash
+
     GOOGLE_GEMINI_API_KEY=your_gemini_api_key_here
     MASTRA_CLOUD_AI_TRACING_EXPORTER=off
 
-
 ### 4. Start the Mastra dev server
-```bash
+
     npx mastra dev
 
 You’ll see your agents and workflows appear in the Mastra Studio interface.
 
-
 ### Run the Workflow Locally
 To manually test the workflow from the command line:
-```bash
-    npx ts-node src/testWorkflow.ts
 
+    npx ts-node src/testWorkflow.ts
 
 ## Telex Integration (A2A)
 
@@ -81,7 +76,7 @@ To connect with Telex.im:
 1. Deploy your Mastra instance to a public endpoint (e.g., Render, Railway, or Vercel).
 2. Use your public /a2a/message endpoint in the Telex workflow JSON.
 Example:
-```json
+
     {
         "nodes": [
             {
@@ -96,7 +91,6 @@ Example:
     >> today
     >> history 7 4 (for July 4th)
     >> history 1 1 (for January 1st)
-
 
 ## Project Structure
     today-in-history/
