@@ -2,6 +2,8 @@
 import { Agent } from "@mastra/core";
 import { Memory } from "@mastra/memory";
 import { LibSQLStore } from "@mastra/libsql";
+import { createTool } from "@mastra/core/tools";
+import { z } from "zod";
 import axios from "axios";
 
 /**
@@ -25,6 +27,50 @@ After getting the events, format them nicely with "📜 Today in History 📜" a
 }
 
 /**
+ * Create the tool for fetching historical events
+ */
+const fetchHistoricalEventsTool = createTool({
+  id: "fetchHistoricalEvents",
+  description: "Fetches historical events for a specific date from Wikipedia's 'On This Day' API. Always provide both month and day as numbers.",
+  inputSchema: z.object({
+    month: z.number().min(1).max(12).describe("Month as a number from 1 (January) to 12 (December)"),
+    day: z.number().min(1).max(31).describe("Day of month as a number from 1 to 31")
+  }),
+  outputSchema: z.string().describe("Formatted historical events text"),
+  execute: async ({ context }) => {
+    const { month, day } = context;
+    
+    try {
+      // Validate parameters
+      if (!month || !day || month < 1 || month > 12 || day < 1 || day > 31) {
+        console.error(`❌ Invalid parameters: month=${month}, day=${day}`);
+        return "Invalid date parameters. Month must be 1-12 and day must be 1-31.";
+      }
+      
+      console.log(`🔍 Fetching historical events for ${month}/${day}...`);
+      
+      const url = `https://en.wikipedia.org/api/rest_v1/feed/onthisday/events/${month}/${day}`;
+      const response = await axios.get(url, {
+        headers: {
+          'User-Agent': 'TodayInHistoryBot/1.0 (Educational Project)'
+        }
+      });
+      const events = response.data.events.slice(0, 5);
+      
+      if (!events.length) {
+        return `No historical events found for ${month}/${day}.`;
+      }
+      
+      const formatted = events.map((e: any) => `• ${e.year}: ${e.text}`).join("\n");
+      return `📜 Historical events for ${month}/${day}:\n\n${formatted}`;
+    } catch (err) {
+      console.error("Error fetching historical events:", err);
+      return "Sorry, I couldn't fetch historical events right now. The Wikipedia API might be temporarily unavailable.";
+    }
+  }
+});
+
+/**
  * Agent with tool integration for fetching historical events
  */
 export const todayInHistoryAgent = new Agent({
@@ -40,66 +86,7 @@ export const todayInHistoryAgent = new Agent({
     }),
   }),
   tools: {
-    fetchHistoricalEvents: {
-      id: "fetchHistoricalEvents",
-      description: "Fetches historical events for a specific date from Wikipedia's 'On This Day' API. Always provide both month and day as numbers.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          month: {
-            type: "number",
-            description: "Month as a number from 1 (January) to 12 (December)",
-            minimum: 1,
-            maximum: 12
-          },
-          day: {
-            type: "number",
-            description: "Day of month as a number from 1 to 31",
-            minimum: 1,
-            maximum: 31
-          }
-        },
-        required: ["month", "day"],
-        additionalProperties: false
-      },
-      execute: async (context: any) => {
-        // Extract parameters - Mastra passes them in context.params or directly
-        const params = context.params || context;
-        const month = params.month;
-        const day = params.day;
-        try {
-          // Validate parameters
-          if (!month || !day || month < 1 || month > 12 || day < 1 || day > 31) {
-            // Silently handle invalid parameters (e.g., from playground validation)
-            if (month === undefined && day === undefined) {
-              return "Please provide both month and day numbers.";
-            }
-            console.error(`❌ Invalid parameters: month=${month}, day=${day}`);
-            return "Invalid date parameters. Month must be 1-12 and day must be 1-31.";
-          }
-          
-          console.log(`🔍 Fetching historical events for ${month}/${day}...`);
-          
-          const url = `https://en.wikipedia.org/api/rest_v1/feed/onthisday/events/${month}/${day}`;
-          const response = await axios.get(url, {
-            headers: {
-              'User-Agent': 'TodayInHistoryBot/1.0 (Educational Project)'
-            }
-          });
-          const events = response.data.events.slice(0, 5);
-          
-          if (!events.length) {
-            return `No historical events found for ${month}/${day}.`;
-          }
-          
-          const formatted = events.map((e: any) => `• ${e.year}: ${e.text}`).join("\n");
-          return `📜 Historical events for ${month}/${day}:\n\n${formatted}`;
-        } catch (err) {
-          console.error("Error fetching historical events:", err);
-          return "Sorry, I couldn't fetch historical events right now. The Wikipedia API might be temporarily unavailable.";
-        }
-      }
-    }
+    fetchHistoricalEvents: fetchHistoricalEventsTool
   }
 });
 
